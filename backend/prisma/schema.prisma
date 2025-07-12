@@ -9,109 +9,131 @@ generator client {
   output   = "../src/generated/prisma"
 }
 
+enum OAuthProvider {
+  google
+  github
+}
+
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
- enum Role {
+
+enum Role {
   farmer
   admin
   expert
 }
+
 enum AccountStatus {
   active
   suspended
   pending
 }
+
 enum paymentstatus {
-   pending
-   success 
-   failed 
+  pending
+  success
+  failed
 }
-enum paymentmethod{
+
+enum paymentmethod {
   stripe
   mpesa
 }
-model User {
-  id                        String   @id @default(uuid())
-  name                      String
-  email                     String   @unique
-  password                  String
-  role                      Role
-  country                   String?
-  county                   String?
-  constituency              String?
-  contact                   String?
-  code                      String
-  isVerified                Boolean  @default(false)
-  profilePic                String?
-  accountStatus             AccountStatus? @default(pending)
-  verificationTokenExpiresAt DateTime
-  resetToken                String?
-  resetTokenExpiresAt       DateTime?
-  onboarding                Boolean? @default(false)
-//Relationship
-  farmer                    Farmer?
-  admin                     Admin?
-  expert                    Expert?
-  diseaseChecks             DiseaseCheck[]
-  payments                  Payment[]
 
+model User {
+  id                         String         @id @default(uuid())
+  username                   String         @unique
+  firstName                  String
+  lastName                   String
+  email                      String         @unique
+  password                   String?
+  role                       Role
+  country                    String?
+  county                     String?
+  constituency               String?
+  contact                    String?
+  code                       String
+  isVerified                 Boolean        @default(false)
+  profilePic                 String?
+  accountStatus              AccountStatus? @default(pending)
+  verificationTokenExpiresAt DateTime
+  resetToken                 String?
+  resetTokenExpiresAt        DateTime?
+  onboarding                 Boolean?       @default(false)
+  contactVerified            Boolean        @default(false)
+  contactVerifyCode          String? // e.g. 6‑digit OTP
+  contactVerifyExpires       DateTime?
+  //Relationship
+  farmer                     Farmer?
+  admin                      Admin?
+  expert                     Expert?
+  diseaseChecks              DiseaseCheck[]
+  payments                   Payment[]
+  oauthAccounts              OAuthAccount[] //user may have many Auth accounts
 }
 
 model Farmer {
-  id        String  @id @default(uuid()) @map("id")
-  location  String?
-  crops     String[] // Postgres array
+  id       String   @id @default(uuid()) @map("id")
+  location String?
+  crops    String[] // Postgres array
 
-  user      User     @relation(fields: [id], references: [id], onDelete: Cascade)
+  user User @relation(fields: [id], references: [id], onDelete: Cascade)
 }
-
 
 model Admin {
-  id           String  @id @default(uuid()) @map("id")
-  adminLevel   String?
+  id         String  @id @default(uuid()) @map("id")
+  adminLevel String?
 
-  user         User     @relation(fields: [id], references: [id], onDelete: Cascade)
+  user User @relation(fields: [id], references: [id], onDelete: Cascade)
 }
-
 
 model Expert {
   id             String  @id @default(uuid()) @map("id")
   specialization String?
   bio            String?
 
-  user           User     @relation(fields: [id], references: [id], onDelete: Cascade)
+  user User @relation(fields: [id], references: [id], onDelete: Cascade)
 }
 
 model DiseaseCheck {
-  id         String   @id @default(uuid())
-  userId     String
-  imageUrl   String
-  createdAt  DateTime @default(now())
+  id        String   @id @default(uuid())
+  userId    String
+  imageUrl  String
+  createdAt DateTime @default(now())
 
-  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  result     ClassificationResult?
+  user   User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  result ClassificationResult?
 }
 
 model ClassificationResult {
-  id               String   @id @default(uuid())
-  diseaseCheckId   String   @unique
-  diseaseName      String
-  confidenceScore  Float
-  diagnosedAt      DateTime @default(now())
-
-  diseaseCheck     DiseaseCheck @relation(fields: [diseaseCheckId], references: [id], onDelete: Cascade)
+  id              String       @id @default(uuid())
+  diseaseCheckId  String       @unique
+  diseaseName     String
+  confidenceScore Float
+  diagnosedAt     DateTime     @default(now())
+  diseaseCheck    DiseaseCheck @relation(fields: [diseaseCheckId], references: [id], onDelete: Cascade)
 }
+
 model Payment {
-  id         String   @id @default(uuid())
-  userId     String
-  amount     Decimal
-  method     String   // Could also be an ENUM (e.g., mpesa, stripe)
-  status     String   // Could be an ENUM: pending, success, failed
-  reference  String
-  createdAt  DateTime @default(now())
+  id        String        @id @default(uuid())
+  userId    String
+  amount    Decimal
+  method    paymentmethod
+  status    paymentstatus
+  reference String
+  createdAt DateTime      @default(now())
 
-  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
+model OAuthAccount {
+  id             String        @id @default(uuid())
+  provider       OAuthProvider
+  providerUserId String // Google "sub" or GitHub numeric id
+  userId         String
+  user           User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerUserId]) // no duplicate links
+}
