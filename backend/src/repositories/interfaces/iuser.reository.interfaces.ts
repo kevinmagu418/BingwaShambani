@@ -1,12 +1,12 @@
 // src/repositories/interfaces/user.repository.interface.ts
-import { type User } from '../../generated/prisma';
+import { type User } from '../../generated/prisma/index.js';
 import {
   EmailRegisterDTO,
   OAuthRegisterDTO,
   UpdateUserDTO,
   CompleteProfileDTO,
   AdminUpdateUserDTO,
-} from '../../domain/userDTO';   // adjust to your path alias or relative import
+} from '../../domain/userDTO.js';   // adjust to your path alias or relative import
 
 export interface IUserRepository {
   /*  Create */
@@ -28,4 +28,9 @@ export interface IUserRepository {
 
   /*   Delete  */
   delete(id: string): Promise<void>;
+
+verifyUserEmail(userId: string): Promise<User>;
+
+findUserByVerificationCode(code: string): Promise<User | null>;
+
 }

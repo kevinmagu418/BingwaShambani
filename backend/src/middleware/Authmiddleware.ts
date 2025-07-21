@@ -1,6 +1,6 @@
 // src/middlewares/auth.middleware.ts
 import { Request, Response, NextFunction, RequestHandler } from 'express';
-import { JwtUtil } from '../utils/auth/jwt.utils';
+import { JwtUtil } from '../utils/auth/jwt.utils.js';
 
 
 export const auth: RequestHandler = async (req, res, next) => {

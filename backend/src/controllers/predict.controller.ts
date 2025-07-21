@@ -4,7 +4,7 @@ import fs from 'fs';
 //fs is node inbuilt   filesystem module , used to read the uploaded image file and later dlete it from server after use
 import axios from 'axios';
 import FormData from 'form-data';//A libray to build multipart/form-data requests manually in node ,like what the browser does in form =files
-import { FLASK_URL } from '../config/flask';
+import { FLASK_URL } from '../config/flask.js';
 
 
 export const predictDisease = async (req: Request, res: Response): Promise<void> => {

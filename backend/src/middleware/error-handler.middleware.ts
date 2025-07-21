@@ -1,4 +1,4 @@
-import { APIError,STATUS_CODE } from '../utils/Errors/app-error';
+import { APIError,STATUS_CODE } from '../utils/Errors/app-error.js';
 import { Request, Response, NextFunction } from 'express';
 
 const ErrorHandler = (

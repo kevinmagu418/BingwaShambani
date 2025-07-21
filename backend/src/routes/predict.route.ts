@@ -1,6 +1,6 @@
 import { Router } from 'express';
-import upload from '../middleware/multer';
-import { predictDisease } from '../controllers/predict.controller';
+import upload from '../middleware/multer.js';
+import { predictDisease } from '../controllers/predict.controller.js';
 
 
 const  predictRouter = Router();

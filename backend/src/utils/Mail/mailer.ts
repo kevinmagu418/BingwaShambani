@@ -1,6 +1,6 @@
 // src/lib/mailer.ts
 import nodemailer from 'nodemailer';
-import { ENV } from '../../config/env';
+import { ENV } from '../../config/env.js';
 
 
 /** One transporter for the whole app */

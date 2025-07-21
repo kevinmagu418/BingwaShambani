@@ -1,5 +1,5 @@
 // src/utils/Errors/email-error.ts
-import { APIError, STATUS_CODE } from './app-error';
+import { APIError, STATUS_CODE } from './app-error.js';
 
 export class EmailError extends APIError {
   constructor(

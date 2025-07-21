@@ -1,4 +1,4 @@
-// src/config/env.ts
+// src/config/env.ts//envloader
 import dotenv from 'dotenv';
 dotenv.config();
 
@@ -17,4 +17,14 @@ export const ENV = {
   frontendBaseUrl: process.env.FRONTEND_BASE_URL || 'http://localhost:3000',
   // Auth
   jwtSecret: process.env.JWT_SECRET!,
+  githubClientId:     process.env.GITHUB_CLIENT_ID!,
+  githubClientSecret: process.env.GITHUB_CLIENT_SECRET!,
+  backendBaseUrl : process.env.BACKEND_BASE_URL  || 'http://localhost:3001',
+ googleClientId:process.env.GOOGLE_CLIENT_ID,
+ googleClientSecret:process.env.GOOGLE_CLIENT_SECRET
 };
+
+
+// why use an env loader  smtpUser: process.env.SMTP_USER! – the ! or a manual check throws on boot, not at runtime after you deploy.Need the frontend URL? Import ENV.frontendBaseUrl anywhere.
+//Cleaner imports	import { ENV } from '@/config/env';
+//Provide fallback ,

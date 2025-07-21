@@ -17,13 +17,17 @@ interface RegisterBase {
 
 /*  Email / password sign‑up */
 export interface EmailRegisterDTO extends RegisterBase {
-  password: string;             // required here
+  password: string;
+  code:string;
+  verificationExpiry:Date; // required here
 }
 
 /*  3 OAuth sign‑up (Google / GitHub)  */
 export interface OAuthRegisterDTO extends RegisterBase {
   provider: 'google' | 'github';
-  providerUserId: string;       // Google “sub” or GitHub numeric ID
+  providerUserId: string;   
+    isVerified?: boolean;
+  // Google “sub” or GitHub numeric ID
   // password is omitted → cannot be provided
 }
 

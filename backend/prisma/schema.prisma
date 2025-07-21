@@ -54,11 +54,11 @@ model User {
   county                     String?
   constituency               String?
   contact                    String?
-  code                       String
+  code                       String?
   isVerified                 Boolean        @default(false)
   profilePic                 String?
   accountStatus              AccountStatus? @default(pending)
-  verificationTokenExpiresAt DateTime
+  verificationTokenExpiresAt DateTime?
   resetToken                 String?
   resetTokenExpiresAt        DateTime?
   onboarding                 Boolean?       @default(false)

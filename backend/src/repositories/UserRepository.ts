@@ -1,14 +1,14 @@
 
-import { PrismaClient } from '@prisma/client';
-import { type User }    from '../generated/prisma';
+import { PrismaClient,Prisma } from '../generated/prisma/index.js';
+import { type User }    from '../generated/prisma/index.js';
 
 
 import { EmailRegisterDTO, 
   OAuthRegisterDTO,
   UpdateUserDTO,
   CompleteProfileDTO,
-  AdminUpdateUserDTO} from '../domain/userDTO';
-import { IUserRepository } from './interfaces/iuser.reository.interfaces';
+  AdminUpdateUserDTO} from '../domain/userDTO.js';
+import { IUserRepository } from './interfaces/iuser.reository.interfaces.js';
 
 export class PrismaUserRepository implements IUserRepository {
   private prisma: PrismaClient;
@@ -18,14 +18,47 @@ export class PrismaUserRepository implements IUserRepository {
   }
 
   /*  CREATE */
-  async createEmailUser(data: EmailRegisterDTO): Promise<User> {
+  async createEmailUser(dto: EmailRegisterDTO): Promise<User> {
+    const data: Prisma.UserCreateInput = {
+      username : dto.username,
+      firstName: dto.firstName,
+      lastName : dto.lastName,
+      email    : dto.email,
+      password : dto.password,                   // already hashed by service
+      role     : dto.role,
+      country       : dto.country,
+      county        : dto.county,
+      constituency  : dto.constituency,
+      contact       : dto.contact,
+      code        :dto.code,
+      verificationTokenExpiresAt :dto.verificationExpiry,
+    };
+
     return this.prisma.user.create({ data });
   }
 
-  async createOAuthUser(data: OAuthRegisterDTO): Promise<User> {
-    // assumes caller already inserted OAuthAccount or will link after
+ async createOAuthUser(dto: OAuthRegisterDTO): Promise<User> {
+    const data: Prisma.UserCreateInput = {
+      username : dto.username,
+      firstName: dto.firstName,
+      lastName : dto.lastName,
+      email    : dto.email,
+      password : null,                            // social users have no pwd
+      role     : dto.role,
+
+      country       : dto.country,
+      county        : dto.county,
+      constituency  : dto.constituency,
+      contact       : dto.contact,
+
+      isVerified: dto.isVerified ?? true,         // auto‑verified
+
+   // instantly “verified”
+    };
+
     return this.prisma.user.create({ data });
   }
+ 
 
   /* READ */
   async findById(id: string): Promise<User | null> {
@@ -55,4 +88,51 @@ export class PrismaUserRepository implements IUserRepository {
   async delete(id: string): Promise<void> {
     await this.prisma.user.delete({ where: { id } });
   }
+
+/* Find OAuthAccount by provider+id */
+  async findOAuth(
+    provider: 'github' | 'google',
+    providerUserId: string
+  ) {
+    return this.prisma.oAuthAccount.findUnique({
+      where: { provider_providerUserId: { provider, providerUserId } },
+      include: { user: true },
+    });
+  }
+ /* Link an account */
+  async linkOAuthAccount(
+    provider: 'github' | 'google',
+    providerUserId: string,
+    userId: string
+  ) {
+    return this.prisma.oAuthAccount.create({
+      data: { provider, providerUserId, userId },
+    });
+  }
+
+
+async findUserByVerificationCode(code: string): Promise<User | null> {
+  return this.prisma.user.findFirst({
+    where: {
+      code,
+      isVerified: false,
+      verificationTokenExpiresAt: {
+        gt: new Date(), // only accept valid non-expired codes
+      },
+    },
+  });
+}
+async verifyUserEmail(userId: string): Promise<User> {
+  return this.prisma.user.update({
+    where: { id: userId },
+    data: {
+      isVerified: true,
+      code: null,
+      verificationTokenExpiresAt: null,
+    },
+  });
+}
+
+
+
 }

@@ -1,4 +1,4 @@
-export function getVerificationEmailTemplate(userName: string, verificationLink: string) {
+export function getVerificationEmailTemplate(userName: string, verificationCode: string) {
   return `
 <!DOCTYPE html>
 <html lang="en">
@@ -23,20 +23,26 @@ export function getVerificationEmailTemplate(userName: string, verificationLink:
     <div style="background-color: white; padding: 24px; border-radius: 0 0 6px 6px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);">
       <p>Hello <strong>${userName}</strong>,</p>
       <p>Thank you for signing up with <strong>Bingwa Shambani 🌿</strong>!</p>
-      <p>Please verify your email by clicking the button below:</p>
+      <p>Please verify your email entering the code  below on loaded page</p>
 
-      <div style="text-align: center; margin: 24px 0;">
-        <a href="${verificationLink}" style="
-          background-color: #43A047;
-          color: white;
+<div style="text-align: center; margin: 24px 0;">
+        <div style="
+          display: inline-block;
+          background-color: #F1F8E9;
+          color: #1B5E20;
+          font-size: 28px;
+          letter-spacing: 8px;
           padding: 12px 24px;
-          text-decoration: none;
           border-radius: 6px;
-          font-size: 16px;
-        ">Verify Email</a>
+          font-weight: bold;
+        ">${verificationCode}</div>
       </div>
 
-      <p>This link will expire in <strong>9 hours</strong> for your security.</p>
+
+      
+
+
+      <p>This code will expire in <strong>9 hours</strong> for your security.</p>
       <p>If you didn’t sign up, you can safely ignore this message.</p>
 
       <p style="margin-top: 32px;">Regards,<br><strong>Bingwa Shambani 🌿</strong></p>
